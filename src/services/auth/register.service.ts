@@ -12,15 +12,8 @@ type RegisterData = {
   userAgent?: string;
 };
 
-export async function registerUser(
-  data: RegisterData
-) {
-  const {
-    email,
-    password,
-    ipAddress,
-    userAgent,
-  } = data;
+export async function registerUser(data: RegisterData) {
+  const {email,password,ipAddress,userAgent,} = data;
 
   // 1. Check existing user
 
@@ -33,7 +26,7 @@ export async function registerUser(
 
   if (existingUser) {
     throw new AuthError(
-      "Account already exists",
+       "Please check your email.",
       409
     );
   }
