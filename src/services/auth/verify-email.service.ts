@@ -1,10 +1,7 @@
 import { AuthError } from "@/src/lib/errors";
 import { prisma } from "@/src/lib/prisma";
+import { redis } from "@/src/lib/redis";
 import argon2 from "argon2";
-
-
-
-
 
 type VerifyEmailData = {
   email: string;
@@ -13,10 +10,50 @@ type VerifyEmailData = {
   userAgent?: string;
 };
 
-export async function verifyEmail(data: VerifyEmailData) {
-  const {email, otp, ipAddress, userAgent,} = data;
+type RedisOtpRecord = {
+  otpHash: string;
+  attempts: number;
+  lockedUntil: number | null;
+};
 
-  // 1. Find pending registration
+export async function verifyEmail(
+  data: VerifyEmailData
+) {
+  const {
+    email,
+    otp,
+    ipAddress,
+    userAgent,
+  } = data;
+
+  // ====================================================
+  // 1. Global IP protection
+  // ====================================================
+
+  const ipKey =
+    `otp-ip-attempts:${ipAddress}`;
+
+  const currentAttempts =
+    await redis.incr(ipKey);
+
+  if (currentAttempts === 1) {
+    await redis.expire(
+      ipKey,
+      60 * 60
+    );
+  }
+
+  if (currentAttempts > 20) {
+    throw new AuthError(
+      "Too many verification attempts. Try again later.",
+      429
+    );
+  }
+
+  // ====================================================
+  // 2. Find pending registration
+  // ====================================================
+
   const pending =
     await prisma.pendingRegistration.findUnique({
       where: {
@@ -25,7 +62,8 @@ export async function verifyEmail(data: VerifyEmailData) {
     });
 
   if (!pending) {
-    const existingUser = await prisma.user.findUnique({
+    const existingUser =
+      await prisma.user.findUnique({
         where: {
           email,
         },
@@ -44,45 +82,55 @@ export async function verifyEmail(data: VerifyEmailData) {
     );
   }
 
-  // 2. Find latest OTP
-  const otpRecord = await prisma.otpCode.findFirst({
-      where: {
-        email,
-        purpose:
-          "EMAIL_VERIFICATION",
-        usedAt: null,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+  // ====================================================
+  // 3. Get OTP from Redis
+  // ====================================================
 
-  if (!otpRecord) {
+  const otpData = await redis.get(
+    `otp:email-verification:${email}`
+  );
+
+  if (!otpData) {
     throw new AuthError(
-      "OTP not found",
+      "OTP not found or expired",
       404
     );
   }
 
-  // 3. Check expiry
+  const otpRecord =
+    JSON.parse(
+      otpData
+    ) as RedisOtpRecord;
 
-  if (otpRecord.expiresAt < new Date()) {
+  // ====================================================
+  // 4. Check lock
+  // ====================================================
+
+  if (
+    otpRecord.lockedUntil &&
+    otpRecord.lockedUntil >
+      Date.now()
+  ) {
     throw new AuthError(
-      "OTP has expired",
-      400
+      "Verification temporarily locked. Request a new code or try again later.",
+      429
     );
   }
 
-  // 4. Check attempts
+  // ====================================================
+  // 5. Check attempts
+  // ====================================================
 
-  if (otpRecord.attempts >= otpRecord.maxAttempts) {
+  if (otpRecord.attempts >= 5) {
     throw new AuthError(
       "Maximum verification attempts exceeded",
       429
     );
   }
 
-  // 5. Verify OTP
+  // ====================================================
+  // 6. Verify OTP
+  // ====================================================
 
   const isValidOtp =
     await argon2.verify(
@@ -90,59 +138,60 @@ export async function verifyEmail(data: VerifyEmailData) {
       otp
     );
 
-  if (!isValidOtp) { await prisma.otpCode.update({
-      where: {
-        id: otpRecord.id,
-      },
+   if (!isValidOtp) {
+  otpRecord.attempts += 1;
+
+  if (otpRecord.attempts >= 5) {
+    otpRecord.lockedUntil =
+      Date.now() + 15 * 60 * 1000;
+
+    await prisma.securityEvent.create({
       data: {
-        attempts: {
-          increment: 1,
+        type: "OTP_BRUTE_FORCE",
+        ipAddress,
+        userAgent,
+        metadata: {
+          email,
+          attempts: otpRecord.attempts,
         },
       },
     });
-
-    throw new AuthError(
-      "Invalid OTP",
-      400
-    );
   }
 
-  // 6. Complete registration
+  await redis.set(
+    `otp:email-verification:${email}`,
+    JSON.stringify(otpRecord),
+    "EX",
+    15 * 60
+  );
 
-  const user = await prisma.$transaction(async (tx) => {
-        const user = await tx.user.create({
+  throw new AuthError(
+    "Invalid OTP",
+    400
+  );
+}
+
+  // ====================================================
+  // 7. Create User
+  // ====================================================
+
+  const user =
+    await prisma.$transaction(
+      async (tx) => {
+        const user =
+          await tx.user.create({
             data: {
-              email:pending.email,
-              passwordHash:pending.passwordHash,
-              emailVerifiedAt:new Date(),
-              onboardingCompleted:false,
+              email:
+                pending.email,
+              passwordHash:
+                pending.passwordHash,
+              emailVerifiedAt:
+                new Date(),
+              onboardingCompleted:
+                false,
               status: "ACTIVE",
             },
           });
-
-        // Mark current OTP used
-
-        await tx.otpCode.update({
-          where: {
-            id: otpRecord.id,
-          },
-          data: {
-            usedAt: new Date(),
-          },
-        });
-
-        // Delete all verification OTPs
-        // for this email
-
-        await tx.otpCode.deleteMany({
-          where: {
-            email,
-            purpose:
-              "EMAIL_VERIFICATION",
-          },
-        });
-
-        // Remove pending registration
 
         await tx.pendingRegistration.delete({
           where: {
@@ -150,12 +199,11 @@ export async function verifyEmail(data: VerifyEmailData) {
           },
         });
 
-        // Audit log
-
         await tx.auditLog.create({
           data: {
             userId: user.id,
-            action:"EMAIL_VERIFIED",
+            action:
+              "EMAIL_VERIFIED",
             ipAddress,
             userAgent,
             metadata: {
@@ -171,9 +219,22 @@ export async function verifyEmail(data: VerifyEmailData) {
       }
     );
 
+  // ====================================================
+  // 8. Remove OTP from Redis
+  // ====================================================
+
+  await redis.del(
+    `otp:email-verification:${email}`
+  );
+
+  // ====================================================
+  // 9. Success
+  // ====================================================
+
   return {
     success: true,
-    message: "Email verified successfully",
+    message:
+      "Email verified successfully",
     userId: user.id,
   };
 }

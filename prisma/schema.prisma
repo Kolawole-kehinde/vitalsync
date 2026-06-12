@@ -206,23 +206,25 @@ model AuditLog {
 model SecurityEvent {
   id String @id @default(cuid())
 
-  userId String
+  userId String?
 
   type SecurityEventType
 
   ipAddress String?
 
-  country String?
-
-  city String?
-
   userAgent String?
 
   metadata Json?
 
+  resolved Boolean @default(false)
+
+  country String?
+
+  city String?
+
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([type])
@@ -279,4 +281,5 @@ enum SecurityEventType {
   PASSWORD_CHANGED
   LOGOUT_ALL_DEVICES
   TOKEN_REUSE_DETECTED
+  OTP_BRUTE_FORCE
 }
