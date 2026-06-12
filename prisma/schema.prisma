@@ -12,7 +12,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id String @id @default(cuid())
 
@@ -35,11 +34,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions      Session[]
-  otpCodes      OtpCode[]
-  resetTokens   PasswordResetToken[]
-  loginAttempts LoginAttempt[]
-  auditLogs     AuditLog[]
+  sessions       Session[]
+  otpCodes       OtpCode[]
+  resetTokens    PasswordResetToken[]
+  loginAttempts  LoginAttempt[]
+  auditLogs      AuditLog[]
+  securityEvents SecurityEvent[]
 }
 
 model Session {
@@ -47,13 +47,21 @@ model Session {
 
   userId String
 
-  refreshTokenHash String @unique
+  refreshTokenHash String
 
   deviceName String?
 
   userAgent String?
 
   ipAddress String?
+
+  country String?
+
+  city String?
+
+  latitude Float?
+
+  longitude Float?
 
   isActive Boolean @default(true)
 
@@ -195,6 +203,32 @@ model AuditLog {
   @@index([createdAt])
 }
 
+model SecurityEvent {
+  id String @id @default(cuid())
+
+  userId String
+
+  type SecurityEventType
+
+  ipAddress String?
+
+  country String?
+
+  city String?
+
+  userAgent String?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
 enum UserStatus {
   ACTIVE
   PENDING_VERIFICATION
@@ -234,5 +268,15 @@ enum SessionRevocationReason {
   LOGOUT_ALL_DEVICES
   PASSWORD_CHANGED
   ADMIN_REVOKED
+  TOKEN_REUSE_DETECTED
+}
+
+enum SecurityEventType {
+  IMPOSSIBLE_TRAVEL
+  NEW_COUNTRY_LOGIN
+  NEW_DEVICE_LOGIN
+  MULTIPLE_FAILED_LOGINS
+  PASSWORD_CHANGED
+  LOGOUT_ALL_DEVICES
   TOKEN_REUSE_DETECTED
 }
