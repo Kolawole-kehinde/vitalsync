@@ -9,48 +9,32 @@ const worker = new Worker(
   async (job) => {
     switch (job.name) {
       case "send-verification-email":
-        await sendVerificationEmailJob(
-          job.data
-        );
+        await sendVerificationEmailJob(job.data);
         break;
 
       default:
-        throw new Error(
-          `Unknown job: ${job.name}`
-        );
+        throw new Error(`Unknown job: ${job.name}`);
     }
   },
   {
     connection: redis,
-  }
+  },
 );
 
 worker.on("ready", () => {
-  console.log(
-    "Email Worker Ready"
-  );
+  console.log("Email Worker Ready");
 });
 
 worker.on("completed", (job) => {
-  console.log(
-    `Job ${job.id} completed`
-  );
+  console.log(`Job ${job.id} completed`);
 });
 
 worker.on("failed", (job, error) => {
-  console.error(
-    `Job ${job?.id} failed`,
-    error
-  );
+  console.error(`Job ${job?.id} failed`, error);
 });
 
 worker.on("error", (error) => {
-  console.error(
-    "Worker Error:",
-    error
-  );
+  console.error("Worker Error:", error);
 });
 
-console.log(
-  " Email Worker Started"
-);
+console.log(" Email Worker Started");

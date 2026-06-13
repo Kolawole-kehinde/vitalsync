@@ -17,8 +17,7 @@ export async function registerUser(data: RegisterData) {
 
   // 1. Check existing user
 
-  const existingUser =
-    await prisma.user.findUnique({
+  const existingUser = await prisma.user.findUnique({
       where: {
         email,
       },
@@ -58,8 +57,7 @@ export async function registerUser(data: RegisterData) {
 
   // 5. Hash OTP
 
-  const otpHash =
-    await argon2.hash(otp);
+  const otpHash = await argon2.hash(otp);
 
   // 6. OTP expiry
 
@@ -82,8 +80,7 @@ export async function registerUser(data: RegisterData) {
 
   // 8. Create pending registration
 
-  const pending =
-    await prisma.$transaction(
+  const pending = await prisma.$transaction(
       async (tx) => {
         const pending =
           await tx.pendingRegistration.create({
@@ -114,15 +111,12 @@ export async function registerUser(data: RegisterData) {
 
   // 9. Queue email
 
-  await emailQueue.add(
-    "send-verification-email",
-    {
+  await emailQueue.add("send-verification-email", {
       email,
       otp,
     },
     {
       attempts: 5,
-
       backoff: {
         type: "exponential",
         delay: 5000,
@@ -137,8 +131,7 @@ export async function registerUser(data: RegisterData) {
 
   return {
     success: true,
-    message:
-      "Verification code sent",
+    message: "Verification code sent",
     pendingId: pending.id,
   };
 }

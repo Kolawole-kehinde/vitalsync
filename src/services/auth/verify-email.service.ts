@@ -81,9 +81,7 @@ export async function verifyEmail( data: VerifyEmailData) {
     );
   }
 
-  const otpRecord = JSON.parse(
-      otpData
-    ) as RedisOtpRecord;
+  const otpRecord = JSON.parse(otpData) as RedisOtpRecord;
 
 
   // 4. Check lock
@@ -151,8 +149,7 @@ export async function verifyEmail( data: VerifyEmailData) {
   const user =
     await prisma.$transaction(
       async (tx) => {
-        const user =
-          await tx.user.create({
+        const user = await tx.user.create({
             data: {
               email: pending.email,
               passwordHash: pending.passwordHash,

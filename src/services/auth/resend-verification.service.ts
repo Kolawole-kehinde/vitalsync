@@ -35,9 +35,7 @@ export async function resendVerificationEmail( data: ResendVerificationData) {
   // 2. Cooldown
 
   const cooldownKey = `otp-resend-cooldown:${email}`;
-  const cooldownExists = await redis.exists(
-      cooldownKey
-    );
+  const cooldownExists = await redis.exists(cooldownKey);
 
   if (cooldownExists) {
     throw new AuthError(
