@@ -37,9 +37,9 @@ model User {
   sessions       Session[]
   otpCodes       OtpCode[]
   resetTokens    PasswordResetToken[]
-  loginAttempts  LoginAttempt[]
   auditLogs      AuditLog[]
   securityEvents SecurityEvent[]
+  loginAttempts LoginAttempt[]
 }
 
 model Session {
@@ -173,6 +173,8 @@ model LoginAttempt {
 
   ipAddress String?
 
+  userAgent String?
+
   createdAt DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -233,6 +235,8 @@ model SecurityEvent {
   @@index([createdAt])
 }
 
+
+
 enum UserStatus {
   ACTIVE
   PENDING_VERIFICATION
@@ -265,6 +269,7 @@ enum LoginFailureReason {
   USER_NOT_FOUND
   ACCOUNT_LOCKED
   UNVERIFIED_EMAIL
+  INVALID_CREDENTIALS
 }
 
 enum SessionRevocationReason {

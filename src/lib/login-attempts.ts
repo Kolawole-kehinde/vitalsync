@@ -1,7 +1,7 @@
+import { LOGIN_LOCK_DURATION } from "../constants/auth.constants";
 import { redis } from "./redis";
 
-const MAX_ATTEMPTS = 5;
-const LOCK_DURATION = 15 * 60;
+
 
 export async function incrementLoginAttempts(
   email: string
@@ -15,7 +15,7 @@ export async function incrementLoginAttempts(
   if (attempts === 1) {
     await redis.expire(
       key,
-      LOCK_DURATION
+      LOGIN_LOCK_DURATION
     );
   }
 
