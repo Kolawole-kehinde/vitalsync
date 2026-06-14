@@ -1,5 +1,5 @@
 import { AuthError } from "@/src/lib/errors";
-import { registerUser } from "@/src/services/auth/register.service";
+import { registerUser } from "@/src/services/auth/register/register.service";
 import { registerSchema } from "@/src/validations/register.schema";
 import { NextRequest, NextResponse } from "next/server";
 

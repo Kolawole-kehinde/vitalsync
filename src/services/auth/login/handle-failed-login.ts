@@ -1,16 +1,10 @@
 import { prisma } from "@/src/lib/prisma";
-
-import {
-  incrementLoginAttempts,
-} from "@/src/lib/login-attempts";
-
-import {
-  LOCK_DURATION_MS,
-  MAX_LOGIN_ATTEMPTS,
-} from "@/src/constants/auth.constants";
+import type { User } from "@prisma/client";
+import {incrementLoginAttempts,} from "@/src/lib/login-attempts";
+import {LOCK_DURATION_MS,MAX_LOGIN_ATTEMPTS} from "@/src/constants/auth.constants";
 
 type FailedLoginData = {
-  user: any;
+  user: User;
   email: string;
   ipAddress?: string;
   userAgent?: string;

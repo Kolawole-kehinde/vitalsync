@@ -1,22 +1,14 @@
 
 import { AuthError } from "@/src/lib/errors";
-import { validateUser } from "./login/validate-user";
-import { handleFailedLogin } from "./login/handle-failed-login";
-import { verifyPassword } from "./login/verify-password";
-import { handleSuccessfulLogin } from "./login/handle-successful-login";
+import { validateUser } from "./validate-user";
+import { handleFailedLogin } from "./handle-failed-login";
+import { verifyPassword } from "./verify-password";
+import { handleSuccessfulLogin } from "./handle-successful-login";
+import { LoginData } from "./types";
 
-type LoginData = {
-  email: string;
-  password: string;
-  ipAddress?: string;
-  userAgent?: string;
-};
 
-export async function loginService(
-  data: LoginData
-) {
-  const email =
-    data.email.trim().toLowerCase();
+export async function loginService(data: LoginData) {
+  const email = data.email.trim().toLowerCase();
 
   const user =
     await validateUser({

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { AuthError } from "@/src/lib/errors";
-import { loginService } from "@/src/services/auth/login.service";
+import { loginService } from "@/src/services/auth/login/login.service";
 import { loginSchema } from "@/src/validations/login.schema";
 
 export async function POST(req: Request) {
@@ -25,6 +25,8 @@ export async function POST(req: Request) {
     const result = await loginService({
       email: validated.data.email,
       password: validated.data.password,
+        ipAddress: req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown",
+        userAgent: req.headers.get("user-agent") ?? "unknown",
     });
 
     return NextResponse.json(

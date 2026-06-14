@@ -12,13 +12,13 @@ type ValidateUserData = {
 };
 
 export async function validateUser(data: ValidateUserData) {
-  const user = await prisma.user.findUnique({
+  const existingUser = await prisma.user.findUnique({
       where: {
         email: data.email,
       },
     });
 
-  if (!user) {
+  if (!existingUser) {
     await argon2.verify(DUMMY_HASH,data.password).catch(() => null);
 
     await prisma.loginAttempt.create({
@@ -40,7 +40,7 @@ export async function validateUser(data: ValidateUserData) {
     );
   }
 
-  if (!user.emailVerifiedAt) {
+  if (!existingUser.emailVerifiedAt) {
     throw new AuthError(
       "Please verify your email before logging in.",
       403
@@ -48,8 +48,8 @@ export async function validateUser(data: ValidateUserData) {
   }
 
   if (
-    user.lockedUntil &&
-    user.lockedUntil >
+    existingUser.lockedUntil &&
+    existingUser.lockedUntil >
       new Date()
   ) {
     throw new AuthError(
@@ -58,7 +58,7 @@ export async function validateUser(data: ValidateUserData) {
     );
   }
 
-   if (existingUser.status !== "ACTIVE") {
+  if (existingUser.status !== "ACTIVE") {
     switch (
       existingUser.status
     ) {
@@ -89,5 +89,5 @@ export async function validateUser(data: ValidateUserData) {
   }
 
 
-  return user;
+  return existingUser;
 }

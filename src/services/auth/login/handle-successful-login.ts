@@ -5,7 +5,10 @@ import {
 } from "@/src/lib/login-attempts";
 
 type SuccessfulLoginData = {
-  user: any;
+  user: {
+    id: string;
+    email: string;
+  };
   ipAddress?: string;
   userAgent?: string;
 };
