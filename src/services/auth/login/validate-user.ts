@@ -4,6 +4,8 @@ import { prisma } from "@/src/lib/prisma";
 import { AuthError } from "@/src/lib/errors";
 import { DUMMY_HASH } from "@/src/constants/auth.constants";
 
+import { unlockUserIfExpired } from "./unlock-user";
+
 type ValidateUserData = {
   email: string;
   password: string;
@@ -11,15 +13,30 @@ type ValidateUserData = {
   userAgent?: string;
 };
 
-export async function validateUser(data: ValidateUserData) {
+export async function validateUser(
+  data: ValidateUserData
+) {
+  // ====================================================
+  // Find User
+  // ====================================================
+
   const existingUser = await prisma.user.findUnique({
       where: {
         email: data.email,
       },
     });
 
+  // ====================================================
+  // Timing Attack Protection
+  // ====================================================
+
   if (!existingUser) {
-    await argon2.verify(DUMMY_HASH,data.password).catch(() => null);
+    await argon2
+      .verify(
+        DUMMY_HASH,
+        data.password
+      )
+      .catch(() => null);
 
     await prisma.loginAttempt.create({
       data: {
@@ -40,17 +57,33 @@ export async function validateUser(data: ValidateUserData) {
     );
   }
 
-  if (!existingUser.emailVerifiedAt) {
+  // ====================================================
+  // Auto Unlock Expired Lock
+  // ====================================================
+
+  const user =
+    await unlockUserIfExpired(
+      existingUser
+    );
+
+  // ====================================================
+  // Email Verification
+  // ====================================================
+
+  if (!user.emailVerifiedAt) {
     throw new AuthError(
       "Please verify your email before logging in.",
       403
     );
   }
 
+  // ====================================================
+  // Active Temporary Lock
+  // ====================================================
+
   if (
-    existingUser.lockedUntil &&
-    existingUser.lockedUntil >
-      new Date()
+    user.lockedUntil &&
+    user.lockedUntil > new Date()
   ) {
     throw new AuthError(
       "Account temporarily locked. Try again later.",
@@ -58,10 +91,12 @@ export async function validateUser(data: ValidateUserData) {
     );
   }
 
-  if (existingUser.status !== "ACTIVE") {
-    switch (
-      existingUser.status
-    ) {
+  // ====================================================
+  // Account Status
+  // ====================================================
+
+  if (user.status !== "ACTIVE") {
+    switch (user.status) {
       case "LOCKED":
         throw new AuthError(
           "Account locked. Contact support.",
@@ -80,6 +115,12 @@ export async function validateUser(data: ValidateUserData) {
           403
         );
 
+      case "PENDING_VERIFICATION":
+        throw new AuthError(
+          "Please verify your email.",
+          403
+        );
+
       default:
         throw new AuthError(
           "Account unavailable.",
@@ -88,6 +129,5 @@ export async function validateUser(data: ValidateUserData) {
     }
   }
 
-
-  return existingUser;
+  return user;
 }

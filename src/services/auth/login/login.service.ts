@@ -7,6 +7,7 @@ import { handleSuccessfulLogin } from "./handle-successful-login";
 import { LoginData } from "./types";
 
 
+
 export async function loginService(data: LoginData) {
   const email = data.email.trim().toLowerCase();
 
@@ -17,6 +18,8 @@ export async function loginService(data: LoginData) {
       ipAddress: data.ipAddress,
       userAgent: data.userAgent,
     });
+
+  
 
   const isValidPassword =
     await verifyPassword({
@@ -37,6 +40,8 @@ export async function loginService(data: LoginData) {
       401
     );
   }
+
+ 
 
   return await handleSuccessfulLogin({
     user,
