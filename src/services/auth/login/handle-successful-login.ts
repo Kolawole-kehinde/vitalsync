@@ -55,6 +55,7 @@ export async function handleSuccessfulLogin(
     user: {
       id: user.id,
       email: user.email,
+      role: user.role,
       status: user.status,
     },
   };

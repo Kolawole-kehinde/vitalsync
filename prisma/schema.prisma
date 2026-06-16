@@ -15,6 +15,8 @@ datasource db {
 model User {
   id String @id @default(cuid())
 
+  role UserRole @default(USER)
+
   email String @unique
 
   passwordHash String
@@ -290,4 +292,9 @@ enum SecurityEventType {
   TOKEN_REUSE_DETECTED
   OTP_BRUTE_FORCE
   OTP_RESEND_ABUSE
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }

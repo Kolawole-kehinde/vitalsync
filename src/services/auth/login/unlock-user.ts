@@ -2,8 +2,7 @@ import { User } from "@prisma/client";
 
 import { prisma } from "@/src/lib/prisma";
 
-export async function unlockUserIfExpired(gituser: User
-) {
+export async function unlockUserIfExpired(user: User) {
   if (
     user.status === "LOCKED" &&
     user.lockedUntil &&
