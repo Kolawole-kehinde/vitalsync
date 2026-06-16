@@ -13,8 +13,7 @@ store in Redis
 export async function createVerificationOtp( email: string) {
   const otp = generateOTP();
 
-  const otpHash =
-    await argon2.hash(otp);
+  const otpHash =  await argon2.hash(otp);
 
   await redis.set(
     `otp:email-verification:${email}`,
