@@ -20,8 +20,8 @@ export type SessionData = {
 
 export type AccessTokenPayload = {
   sub: string;
-  sid: string;
-  role: string;
+  sessionId: string;
+  role: UserRole;
 };
 
 export type CreateSessionResult = {

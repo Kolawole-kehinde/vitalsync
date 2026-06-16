@@ -13,4 +13,11 @@ export const OTP_LOCK_DURATION =
 export const LOCK_DURATION_MS =
   15 * 60 * 1000;
 
+
+export const SESSION_TTL_SECONDS =
+  30 * 24 * 60 * 60;
+
+export const SESSION_TTL_MS =
+  SESSION_TTL_SECONDS * 1000;
+
 export const DUMMY_HASH ="$argon2id$v=19$m=65536,t=3,p=4$VGVzdFRlc3RUZXN0VGVzdA$2L6N6Cz4A2Nw8k5x7sN3M8mLxX4k7w8s6lN8rVj6o5w";

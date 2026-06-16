@@ -8,13 +8,15 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const validated = loginSchema.safeParse(body);
+    const validated =
+      loginSchema.safeParse(body);
 
     if (!validated.success) {
       return NextResponse.json(
         {
           success: false,
-          errors: validated.error.flatten(),
+          errors:
+            validated.error.flatten(),
         },
         {
           status: 400,
@@ -22,20 +24,47 @@ export async function POST(req: Request) {
       );
     }
 
-    const result = await loginService({
-      email: validated.data.email,
-      password: validated.data.password,
-        ipAddress: req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown",
-        userAgent: req.headers.get("user-agent") ?? "unknown",
-    });
+    const result =
+      await loginService({
+        email:
+          validated.data.email,
+        password:
+          validated.data.password,
+        ipAddress:
+          req.headers.get(
+            "x-forwarded-for"
+          ) ??
+          req.headers.get(
+            "x-real-ip"
+          ) ??
+          "unknown",
+        userAgent:
+          req.headers.get(
+            "user-agent"
+          ) ?? "unknown",
+      });
 
     return NextResponse.json(
       {
         success: true,
-        message: "Login successful",
+        message:
+          "Login successful",
+
         user: {
           id: result.user.id,
-          email: result.user.email,
+          email:
+            result.user.email,
+          role:
+            result.user.role,
+        },
+
+        session: {
+          sessionId:
+            result.session.sessionId,
+          accessToken:
+            result.session.accessToken,
+          refreshToken:
+            result.session.refreshToken,
         },
       },
       {
@@ -43,14 +72,21 @@ export async function POST(req: Request) {
       }
     );
   } catch (error) {
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
+
     if (error instanceof AuthError) {
       return NextResponse.json(
         {
           success: false,
-          message: error.message,
+          message:
+            error.message,
         },
         {
-          status: error.statusCode,
+          status:
+            error.statusCode,
         }
       );
     }
@@ -58,7 +94,8 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-        message: "Internal server error",
+        message:
+          "Internal server error",
       },
       {
         status: 500,

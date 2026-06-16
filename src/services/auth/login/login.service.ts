@@ -8,22 +8,17 @@ import { createSession } from "./create-session";
 
 import { LoginData } from "./types";
 
-export async function loginService(
-  data: LoginData
-) {
-  const email =
-    data.email.trim().toLowerCase();
+export async function loginService(data: LoginData) {
+  const email = data.email.trim().toLowerCase();
 
-  const user =
-    await validateUser({
+  const user = await validateUser({
       email,
       password: data.password,
       ipAddress: data.ipAddress,
       userAgent: data.userAgent,
     });
 
-  const isValidPassword =
-    await verifyPassword({
+  const isValidPassword = await verifyPassword({
       passwordHash: user.passwordHash,
       password: data.password,
     });

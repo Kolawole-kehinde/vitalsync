@@ -2,18 +2,11 @@ import { redis } from "@/src/lib/redis";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const keys = await redis.keys("*");
+  const key =
+    "session:cmqh39k9a0005ugfowro21zcd";
 
-  const result = [];
+  const session =
+    await redis.get(key);
 
-  for (const key of keys) {
-    const value = await redis.get(key);
-
-    result.push({
-      key,
-      value,
-    });
-  }
-
-  return NextResponse.json(result);
+  return NextResponse.json(session);
 }
