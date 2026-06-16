@@ -11,13 +11,10 @@ export type SessionData = {
   userId: string;
   email: string;
   role: UserRole;
-
   ipAddress?: string;
   userAgent?: string;
-
   country?: string;
   city?: string;
-
   deviceName?: string;
 };
 
