@@ -11,6 +11,7 @@ import { getLocation } from "./get-location";
 import { parseDevice } from "./parse-device";
 import { detectNewDevice } from "./detect-new-device";
 import { createNewDeviceEvent } from "./create-new-device-event";
+import { notifyNewDevice } from "./notify-new-device";
 
 export async function loginService(data: LoginData) {
   const email = data.email.trim().toLowerCase();
@@ -49,6 +50,10 @@ export async function loginService(data: LoginData) {
 
   const location = await getLocation( data.ipAddress);
   console.log("IP:",data.ipAddress);
+
+// const location = await getLocation("8.8.8.8");
+// console.log(location);
+
   const deviceName = parseDevice(data.userAgent);
   console.log(data.userAgent);
 
@@ -63,6 +68,12 @@ export async function loginService(data: LoginData) {
     ipAddress: data.ipAddress,
     userAgent: data.userAgent,
     deviceName,
+  });
+
+    await notifyNewDevice({
+    email: user.email,
+    deviceName,
+    ipAddress: data.ipAddress,
   });
 }
 

@@ -26,10 +26,7 @@ export async function POST(req: Request) {
     const result = await loginService({
       email: validated.data.email,
       password: validated.data.password,
-      ipAddress:
-        req.headers.get("x-forwarded-for") ??
-        req.headers.get("x-real-ip") ??
-        "unknown",
+      ipAddress:req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??req.headers.get("x-real-ip") ??"unknown",
       userAgent: req.headers.get("user-agent") ?? "unknown",
     });
 
