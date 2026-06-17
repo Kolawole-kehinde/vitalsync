@@ -16,6 +16,8 @@ export type SessionData = {
   country?: string;
   city?: string;
   deviceName?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export type AccessTokenPayload = {
