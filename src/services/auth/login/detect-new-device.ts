@@ -5,9 +5,7 @@ type DetectNewDeviceData = {
   deviceName?: string;
 };
 
-export async function detectNewDevice(
-  data: DetectNewDeviceData
-) {
+export async function detectNewDevice(data: DetectNewDeviceData) {
   if (!data.deviceName) {
     return false;
   }

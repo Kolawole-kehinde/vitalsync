@@ -4,6 +4,7 @@ import { AuthError } from "@/src/lib/errors";
 import { loginService } from "@/src/services/auth/login/login.service";
 import { loginSchema } from "@/src/validations/login.schema";
 import { setAuthCookies } from "@/src/lib/auth-cookies";
+import { checkLoginRateLimit } from "@/src/services/auth/login/check-login-rate-limit";
 
 export async function POST(req: Request) {
   try {
@@ -22,6 +23,18 @@ export async function POST(req: Request) {
         },
       );
     }
+
+  const ipAddress = req.headers
+    .get("x-forwarded-for")
+    ?.split(",")[0]
+    ?.trim() ??
+  req.headers.get("x-real-ip") ?? "unknown";
+
+// const userAgent =
+//   req.headers.get("user-agent") ??
+//   "unknown";
+
+  await checkLoginRateLimit(ipAddress)
 
     const result = await loginService({
       email: validated.data.email,

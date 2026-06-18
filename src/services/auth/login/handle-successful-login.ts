@@ -1,8 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 
-import {
-  resetLoginAttempts,
-} from "@/src/lib/login-attempts";
+import { resetLoginAttempts,} from "@/src/lib/login-attempts";
 
 type SuccessfulLoginData = {
   user: {

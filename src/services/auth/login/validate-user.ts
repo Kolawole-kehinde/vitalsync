@@ -3,7 +3,6 @@ import argon2 from "argon2";
 import { prisma } from "@/src/lib/prisma";
 import { AuthError } from "@/src/lib/errors";
 import { DUMMY_HASH } from "@/src/constants/auth.constants";
-
 import { unlockUserIfExpired } from "./unlock-user";
 
 type ValidateUserData = {
@@ -13,12 +12,9 @@ type ValidateUserData = {
   userAgent?: string;
 };
 
-export async function validateUser(
-  data: ValidateUserData
-) {
-  // ====================================================
+export async function validateUser(data: ValidateUserData) {
+ 
   // Find User
-  // ====================================================
 
   const existingUser = await prisma.user.findUnique({
       where: {
@@ -26,9 +22,8 @@ export async function validateUser(
       },
     });
 
-  // ====================================================
+
   // Timing Attack Protection
-  // ====================================================
 
   if (!existingUser) {
     await argon2
@@ -57,19 +52,17 @@ export async function validateUser(
     );
   }
 
-  // ====================================================
+
   // Auto Unlock Expired Lock
-  // ====================================================
 
   const user =
     await unlockUserIfExpired(
       existingUser
     );
 
-  // ====================================================
+ 
   // Email Verification
-  // ====================================================
-
+ 
   if (!user.emailVerifiedAt) {
     throw new AuthError(
       "Please verify your email before logging in.",
@@ -77,9 +70,8 @@ export async function validateUser(
     );
   }
 
-  // ====================================================
+
   // Active Temporary Lock
-  // ====================================================
 
   if (
     user.lockedUntil &&
@@ -91,10 +83,8 @@ export async function validateUser(
     );
   }
 
-  // ====================================================
   // Account Status
-  // ====================================================
-
+  
   if (user.status !== "ACTIVE") {
     switch (user.status) {
       case "LOCKED":

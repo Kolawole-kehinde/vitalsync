@@ -33,16 +33,16 @@ export async function createSession(
     },
   });
 
-await redis.set(
-  `session:${session.id}`,
-  JSON.stringify({
-    sessionId: session.id,
-    userId: data.userId,
-    lastActivityAt: Date.now(),
-  }),
-  "EX",
-  SESSION_TTL_SECONDS,
-);
+  await redis.set(
+    `session:${session.id}`,
+    JSON.stringify({
+      sessionId: session.id,
+      userId: data.userId,
+      lastActivityAt: Date.now(),
+    }),
+    "EX",
+    SESSION_TTL_SECONDS,
+  );
   // Generate Access Token
 
   const accessToken = await generateAccessToken({

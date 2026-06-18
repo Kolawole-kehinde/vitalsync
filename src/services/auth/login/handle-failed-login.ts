@@ -23,24 +23,18 @@ export async function handleFailedLogin(data: FailedLoginData) {
           userId: data.user.id,
           email: data.email,
           success: false,
-          failureReason:
-            "INVALID_PASSWORD",
-          ipAddress:
-            data.ipAddress,
-          userAgent:
-            data.userAgent,
+          failureReason: "INVALID_PASSWORD",
+          ipAddress: data.ipAddress,
+          userAgent: data.userAgent,
         },
       });
 
       await tx.auditLog.create({
         data: {
           userId: data.user.id,
-          action:
-            "LOGIN_FAILED",
-          ipAddress:
-            data.ipAddress,
-          userAgent:
-            data.userAgent,
+          action: "LOGIN_FAILED",
+          ipAddress:data.ipAddress,
+          userAgent: data.userAgent,
         },
       });
 
