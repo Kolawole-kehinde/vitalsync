@@ -2,7 +2,6 @@ import { AuthError } from "@/src/lib/errors";
 import { prisma } from "@/src/lib/prisma";
 import { redis } from "@/src/lib/redis";
 import argon2 from "argon2";
-
 import { checkOtpVerifyRateLimit } from "./check-otp-verify-rate-limit";
 
 type VerifyEmailData = {
@@ -19,7 +18,10 @@ type RedisOtpRecord = {
 };
 
 export async function verifyEmail(data: VerifyEmailData) {
-  const { email, otp, ipAddress, userAgent } = data;
+
+   const email = data.email.trim().toLowerCase();
+
+  const {otp, ipAddress, userAgent } = data;
 
   await checkOtpVerifyRateLimit(email);
 

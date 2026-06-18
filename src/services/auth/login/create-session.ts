@@ -8,20 +8,30 @@ import {
   SESSION_TTL_MS,
   SESSION_TTL_SECONDS,
 } from "@/src/constants/auth.constants";
+import { createId } from "@paralleldrive/cuid2";
 
-export async function createSession(
-  data: SessionData,
+export async function createSession(data: SessionData,
 ): Promise<CreateSessionResult> {
+
+
+  const sessionId = createId();
   // Generate Refresh Token
 
-  const refreshToken = generateRefreshToken();
+const {
+  token: refreshToken,
+  secret,
+} = generateRefreshToken(
+  sessionId
+);
 
-  const refreshTokenHash = await hashRefreshToken(refreshToken);
+const refreshTokenHash =
+  await hashRefreshToken(secret);
 
   // Create Session Record
 
   const session = await prisma.session.create({
     data: {
+      id: sessionId,
       userId: data.userId,
       refreshTokenHash,
       deviceName: data.deviceName,
@@ -43,8 +53,9 @@ export async function createSession(
     "EX",
     SESSION_TTL_SECONDS,
   );
-  // Generate Access Token
 
+
+  // Generate Access Token
   const accessToken = await generateAccessToken({
     sub: data.userId,
     sessionId: session.id,

@@ -14,7 +14,11 @@ type ResendVerificationData = {
 };
 
 export async function resendVerificationEmail( data: ResendVerificationData) {
-  const {email, ipAddress, userAgent,} = data;
+ const email = data.email.trim().toLowerCase();
+
+  const { ipAddress, userAgent,} = data;
+
+  await checkOtpResendRateLimit(email);
 
 
   // 1. Registration must exist
@@ -78,8 +82,6 @@ export async function resendVerificationEmail( data: ResendVerificationData) {
   // 4. Create cooldown
 
   await redis.set(cooldownKey,"1", "EX", 60);
-
-  await checkOtpResendRateLimit(data.email)
 
   // 5. Generate OTP
 

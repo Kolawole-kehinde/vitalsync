@@ -1,9 +1,13 @@
 import crypto from "crypto";
 
-export function generateRefreshToken() {
-  const bytes = Number(
- process.env.REFRESH_TOKEN_BYTES ?? 64
+export function generateRefreshToken(sessionId: string) {
+  const bytes = Number(process.env.REFRESH_TOKEN_BYTES ?? 64
   );
 
-  return crypto.randomBytes(bytes).toString("hex");
+  const secret = crypto.randomBytes(bytes) .toString("hex");
+
+  return {
+    token:`${sessionId}.${secret}`,
+    secret,
+  };
 }

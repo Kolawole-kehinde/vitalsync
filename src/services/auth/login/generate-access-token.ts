@@ -1,6 +1,6 @@
 import { SignJWT } from "jose";
-
 import { AccessTokenPayload } from "./types";
+import crypto from "crypto";
 
 export async function generateAccessToken(data: AccessTokenPayload) {
   const secret = process.env.ACCESS_TOKEN_SECRET;
@@ -14,7 +14,7 @@ export async function generateAccessToken(data: AccessTokenPayload) {
   const secretKey = new TextEncoder().encode(secret);
 
   return await new SignJWT({
-    sid: data.sessionId,
+    sessionId: data.sessionId,
     role: data.role,
   })
     .setProtectedHeader({

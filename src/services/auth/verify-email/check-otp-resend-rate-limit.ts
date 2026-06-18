@@ -3,8 +3,8 @@ import { rateLimit } from "@/src/lib/rate-limit";
 
 export async function checkOtpResendRateLimit(email: string){
   const result = await rateLimit({
-    key:`rate_limi:otp_resend:${email}`,
-    limit: 3,
+    key:`rate_limit:otp_resend:${email}`,
+    limit: 2,
     windowSeconds: 15 * 60
   })
   if(!result.allowed){
