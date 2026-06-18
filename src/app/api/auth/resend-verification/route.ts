@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthError } from "@/src/lib/errors";
-import { resendVerificationEmail } from "@/src/services/auth/resend-verification.service";
 import { resendVerificationSchema } from "@/src/validations/resend-verification.schema";
+import { resendVerificationEmail } from "@/src/services/auth/verify-email/resend-verification.service";
 
 export async function POST(request: NextRequest) {
   try {

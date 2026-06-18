@@ -8,6 +8,10 @@ type RateLimitOptions = {
 
 export async function rateLimit(data: RateLimitOptions) {
   const count = await redis.incr(data.key);
+  console.log("RATE LIMIT", {
+  key: data.key,
+  count,
+});
 
   if (count === 1) {
      await redis.expire(
@@ -15,6 +19,9 @@ export async function rateLimit(data: RateLimitOptions) {
       data.windowSeconds
     );
   }
+
+
+
 
   return {
     allowed: count <= data.limit,

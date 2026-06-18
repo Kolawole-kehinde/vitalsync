@@ -1,5 +1,5 @@
 import { AuthError } from "@/src/lib/errors";
-import { verifyEmail } from "@/src/services/auth/verify-email.service";
+import { verifyEmail } from "@/src/services/auth/verify-email/verify-email.service";
 import { verifyEmailSchema } from "@/src/validations/verify-email.schema";
 import { NextRequest, NextResponse } from "next/server";
 

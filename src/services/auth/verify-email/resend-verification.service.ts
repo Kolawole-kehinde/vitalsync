@@ -5,6 +5,7 @@ import { generateOTP } from "@/src/lib/otp";
 import { prisma } from "@/src/lib/prisma";
 import { redis } from "@/src/lib/redis";
 import { emailQueue } from "@/src/lib/queue";
+import { checkOtpResendRateLimit } from "./check-otp-resend-rate-limit";
 
 type ResendVerificationData = {
   email: string;
@@ -77,6 +78,8 @@ export async function resendVerificationEmail( data: ResendVerificationData) {
   // 4. Create cooldown
 
   await redis.set(cooldownKey,"1", "EX", 60);
+
+  await checkOtpResendRateLimit(data.email)
 
   // 5. Generate OTP
 
