@@ -1,14 +1,14 @@
 import { prisma } from "@/src/lib/prisma";
 import { redis } from "@/src/lib/redis";
 import { generateAccessToken } from "./generate-access-token";
-import { generateRefreshToken } from "./generate-refresh-token";
-import { hashRefreshToken } from "./hash-refresh-token";
 import type { SessionData, CreateSessionResult } from "./types";
 import {
   SESSION_TTL_MS,
   SESSION_TTL_SECONDS,
 } from "@/src/constants/auth.constants";
 import { createId } from "@paralleldrive/cuid2";
+import { generateRefreshToken } from "../refresh/generate-refresh-token";
+import { hashRefreshToken } from "../refresh/hash-refresh-token";
 
 export async function createSession(data: SessionData,
 ): Promise<CreateSessionResult> {
