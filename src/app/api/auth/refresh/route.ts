@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { AuthError } from "@/src/lib/errors";
 import { refreshSession } from "@/src/services/auth/refresh/refresh.service";
 import { setAuthCookies } from "@/src/lib/auth-cookies";
 import { REFRESH_TOKEN_COOKIE } from "@/src/constants/cookie.constants";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();
 
