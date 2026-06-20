@@ -19,13 +19,6 @@ export type SessionData = {
   latitude?: number;
   longitude?: number;
 };
-
-export type AccessTokenPayload = {
-  sub: string;
-  sessionId: string;
-  role: UserRole;
-};
-
 export type CreateSessionResult = {
   sessionId: string;
   accessToken: string;

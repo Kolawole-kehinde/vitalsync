@@ -1,7 +1,8 @@
-import { generateAccessToken } from "../login/generate-access-token";
+
 
 import { verifyRefreshToken } from "./verify-refresh-token";
 import { rotateRefreshToken } from "./rotate-refresh-token";
+import { generateAccessToken } from "../access-token/generate-access-token";
 
 export async function refreshSession(refreshToken: string) {
   const session = await verifyRefreshToken(

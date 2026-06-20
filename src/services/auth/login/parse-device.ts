@@ -1,29 +1,19 @@
 import { UAParser } from "ua-parser-js";
 
-export function parseDevice(
-  userAgent?: string
-) {
+export function parseDevice(userAgent?: string) {
   if (!userAgent) {
     return "Unknown Device";
   }
 
-  if (
-    userAgent.includes(
-      "PostmanRuntime"
-    )
-  ) {
+  if (userAgent.includes("PostmanRuntime")) {
     return "Postman";
   }
 
-  const parser = new UAParser(
-    userAgent
-  );
+  const parser = new UAParser(userAgent);
 
-  const browser =
-    parser.getBrowser().name;
+  const browser = parser.getBrowser().name;
 
-  const os =
-    parser.getOS().name;
+  const os = parser.getOS().name;
 
   if (!browser && !os) {
     return "Unknown Device";

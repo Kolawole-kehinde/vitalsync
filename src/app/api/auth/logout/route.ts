@@ -1,7 +1,7 @@
 import { REFRESH_TOKEN_COOKIE } from "@/src/constants/cookie.constants";
 import { clearAuthCookies } from "@/src/lib/auth-cookies";
 import { AuthError } from "@/src/lib/errors";
-import { logoutService } from "@/src/services/logout/logout.service";
+import { logoutService } from "@/src/services/auth/logout/logout.service";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 

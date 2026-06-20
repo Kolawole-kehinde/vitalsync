@@ -1,6 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
-import { verifyRefreshToken } from "../auth/refresh/verify-refresh-token";
 import { redis } from "@/src/lib/redis";
+import { verifyRefreshToken } from "../refresh/verify-refresh-token";
 
 
 export async function logoutAllService(refreshToken: string){

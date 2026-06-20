@@ -1,6 +1,5 @@
 import { prisma } from "@/src/lib/prisma";
 import { redis } from "@/src/lib/redis";
-import { generateAccessToken } from "./generate-access-token";
 import type { SessionData, CreateSessionResult } from "./types";
 import {
   SESSION_TTL_MS,
@@ -9,6 +8,7 @@ import {
 import { createId } from "@paralleldrive/cuid2";
 import { generateRefreshToken } from "../refresh/generate-refresh-token";
 import { hashRefreshToken } from "../refresh/hash-refresh-token";
+import { generateAccessToken } from "../access-token/generate-access-token";
 
 export async function createSession(data: SessionData,
 ): Promise<CreateSessionResult> {

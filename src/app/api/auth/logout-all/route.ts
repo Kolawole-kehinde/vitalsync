@@ -1,7 +1,7 @@
 import { REFRESH_TOKEN_COOKIE } from "@/src/constants/cookie.constants";
 import { clearAuthCookies } from "@/src/lib/auth-cookies";
 import { AuthError } from "@/src/lib/errors";
-import { logoutAllService } from "@/src/services/logout-all/logout-all.service";
+import { logoutAllService } from "@/src/services/auth/logout-all/logout-all.service";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -24,7 +24,7 @@ export async function POST() {
 
     const response = NextResponse.json({
         success: true,
-        message:"Logged out all devices successfully",
+        message:"Logged out from all devices successfully",
       });
 
     clearAuthCookies(response);
