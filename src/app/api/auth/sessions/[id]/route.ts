@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import { AuthError } from "@/src/lib/errors";
-
 import { getAuthUser } from "@/src/services/auth/access-token/get-auth-user";
 import { revokeSession } from "@/src/services/auth/sessions/revoke-session.service";
 
@@ -11,34 +10,37 @@ type RouteParams = {
   }>;
 };
 
-export async function DELETE(req: Request,{ params }: RouteParams) {
+export async function DELETE(req: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
 
-    const { user } = await getAuthUser();
+    const { user, sessionId } = await getAuthUser();
 
-    await revokeSession(
-      user.id,
-      id
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: "Session revoked successfully",
+    await revokeSession({
+      userId: user.id,
+      sessionId: id,
+      currentSessionId: sessionId,
     });
-  } catch (error) {
-    console.error(
-      "REVOKE SESSION ERROR:",
-      error
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Session revoked successfully",
+      },
+      {
+        status: 200,
+      },
     );
+  } catch (error) {
+    console.error("REVOKE SESSION ERROR:", error);
 
-    if ( error instanceof AuthError) {
+    if (error instanceof AuthError) {
       return NextResponse.json({
           success: false,
           message: error.message,
         },
-        { status: error.statusCode,
-        }
+        {
+          status: error.statusCode,
+        },
       );
     }
 
@@ -46,7 +48,9 @@ export async function DELETE(req: Request,{ params }: RouteParams) {
         success: false,
         message: "Internal server error",
       },
-      { status: 500,}
+      {
+        status: 500,
+      },
     );
   }
 }

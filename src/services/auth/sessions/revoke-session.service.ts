@@ -12,10 +12,7 @@ export async function revokeSession(data: RevokeSessionData) {
   const { userId, sessionId, currentSessionId } = data;
 
   if (sessionId === currentSessionId) {
-    throw new AuthError(
-        "Use logout endpoint for current session", 
-        400
-    );
+    throw new AuthError("Use logout endpoint for current session", 400);
   }
 
   const session = await prisma.session.findUnique({

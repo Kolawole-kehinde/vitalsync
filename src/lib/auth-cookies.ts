@@ -12,7 +12,10 @@ type SetAuthCookiesData = {
   refreshToken: string;
 };
 
-export function setAuthCookies( response: NextResponse, data: SetAuthCookiesData,) {
+export function setAuthCookies(
+  response: NextResponse,
+  data: SetAuthCookiesData,
+) {
   response.cookies.set(ACCESS_TOKEN_COOKIE, data.accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
