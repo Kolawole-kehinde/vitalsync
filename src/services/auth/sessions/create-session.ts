@@ -1,6 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 import { redis } from "@/src/lib/redis";
-import type { SessionData, CreateSessionResult } from "./types";
+
 import {
   SESSION_TTL_MS,
   SESSION_TTL_SECONDS,
@@ -9,6 +9,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { generateRefreshToken } from "../refresh/generate-refresh-token";
 import { hashRefreshToken } from "../refresh/hash-refresh-token";
 import { generateAccessToken } from "../access-token/generate-access-token";
+import { CreateSessionResult, SessionData } from "../login/types";
 
 export async function createSession(data: SessionData,
 ): Promise<CreateSessionResult> {
@@ -39,6 +40,7 @@ const refreshTokenHash =
       ipAddress: data.ipAddress,
       country: data.country,
       city: data.city,
+      lastActivityAt: new Date(),
       expiresAt: new Date(Date.now() + SESSION_TTL_MS),
     },
   });

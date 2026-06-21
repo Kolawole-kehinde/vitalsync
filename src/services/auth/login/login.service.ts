@@ -1,17 +1,15 @@
 import { AuthError } from "@/src/lib/errors";
-
 import { validateUser } from "./validate-user";
 import { verifyPassword } from "./verify-password";
 import { handleFailedLogin } from "./handle-failed-login";
 import { handleSuccessfulLogin } from "./handle-successful-login";
-import { createSession } from "./create-session";
-
 import { LoginData } from "./types";
 import { getLocation } from "./get-location";
 import { parseDevice } from "./parse-device";
 import { detectNewDevice } from "./detect-new-device";
 import { createNewDeviceEvent } from "./create-new-device-event";
 import { notifyNewDevice } from "./notify-new-device";
+import { createSession } from "../sessions/create-session";
 
 export async function loginService(data: LoginData) {
   const email = data.email.trim().toLowerCase();
@@ -88,6 +86,7 @@ export async function loginService(data: LoginData) {
   latitude: location.latitude,
   longitude: location.longitude,
   deviceName,
+  
 });
   return {
     success: true,

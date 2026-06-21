@@ -24,8 +24,7 @@ export async function handleSuccessfulLogin(
       data: {
         status: "ACTIVE",
         lockedUntil: null,
-        lastLoginAt:
-          new Date(),
+        lastLoginAt: new Date(),
       },
     });
 

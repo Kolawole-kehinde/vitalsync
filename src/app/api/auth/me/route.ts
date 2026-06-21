@@ -18,6 +18,7 @@ export async function GET() {
         emailVerified: !!user.emailVerifiedAt,
         onboardingCompleted: user.onboardingCompleted,
         createdAt: user.createdAt,
+        lastActivityAt: new Date()
       },
     });
   } catch (error) {

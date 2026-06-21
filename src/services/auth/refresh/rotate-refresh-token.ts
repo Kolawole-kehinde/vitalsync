@@ -18,8 +18,7 @@ export async function rotateRefreshToken(sessionId: string) {
     },
     data: {
       refreshTokenHash,
-      lastActivityAt:
-        new Date(),
+      lastActivityAt: new Date(),
     },
   });
 
