@@ -4,6 +4,7 @@ import { prisma } from "@/src/lib/prisma";
 import { AuthError } from "@/src/lib/errors";
 import { ACCESS_TOKEN_COOKIE } from "@/src/constants/cookie.constants";
 import { verifyAccessToken } from "./verify-access-token";
+import { updateSessionActivity } from "../sessions/update-session-activity";
 
 
 
@@ -28,6 +29,11 @@ export async function getAuthUser() {
   if (!user) {
     throw new AuthError("User not found", 404);
   }
+
+  await updateSessionActivity(
+  payload.sessionId,
+  payload.sub
+);
 
   return {
     user,

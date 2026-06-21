@@ -2,8 +2,22 @@ import { prisma } from "@/src/lib/prisma";
 import { redis } from "@/src/lib/redis";
 import { AuthError } from "@/src/lib/errors";
 
-export async function revokeSession(userId: string, sessionId: string) {
-    
+type RevokeSessionData = {
+  userId: string;
+  sessionId: string;
+  currentSessionId: string;
+};
+
+export async function revokeSession(data: RevokeSessionData) {
+  const { userId, sessionId, currentSessionId } = data;
+
+  if (sessionId === currentSessionId) {
+    throw new AuthError(
+        "Use logout endpoint for current session", 
+        400
+    );
+  }
+
   const session = await prisma.session.findUnique({
     where: {
       id: sessionId,
