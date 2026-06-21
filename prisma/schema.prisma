@@ -280,6 +280,7 @@ enum SessionRevocationReason {
   PASSWORD_CHANGED
   ADMIN_REVOKED
   TOKEN_REUSE_DETECTED
+  USER_REVOKED
 }
 
 enum SecurityEventType {
