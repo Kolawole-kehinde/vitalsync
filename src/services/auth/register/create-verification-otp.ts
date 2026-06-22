@@ -15,8 +15,7 @@ export async function createVerificationOtp( email: string) {
 
   const otpHash =  await argon2.hash(otp);
 
-  await redis.set(
-    `otp:email-verification:${email}`,
+  await redis.set( `otp:email-verification:${email}`,
     JSON.stringify({
       otpHash,
       attempts: 0,

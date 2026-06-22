@@ -47,7 +47,7 @@ export async function loginService(data: LoginData) {
   });
 
   const location = await getLocation( data.ipAddress);
-  console.log("IP:",data.ipAddress);
+  // console.log("IP:",data.ipAddress);
 
 // const location = await getLocation("8.8.8.8");
 // console.log(location);

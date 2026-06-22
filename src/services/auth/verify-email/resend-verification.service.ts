@@ -4,8 +4,8 @@ import { AuthError } from "@/src/lib/errors";
 import { generateOTP } from "@/src/lib/otp";
 import { prisma } from "@/src/lib/prisma";
 import { redis } from "@/src/lib/redis";
-import { emailQueue } from "@/src/lib/queue";
 import { checkOtpResendRateLimit } from "./check-otp-resend-rate-limit";
+import { queueVerificationEmail } from "@/src/helper/queueVerificationEmail";
 
 type ResendVerificationData = {
   email: string;
@@ -15,14 +15,12 @@ type ResendVerificationData = {
 
 export async function resendVerificationEmail( data: ResendVerificationData) {
  const email = data.email.trim().toLowerCase();
+ const { ipAddress, userAgent,} = data;
 
-  const { ipAddress, userAgent,} = data;
-
-  await checkOtpResendRateLimit(email);
+ await checkOtpResendRateLimit(email, ipAddress);
 
 
   // 1. Registration must exist
-
   const pending = await prisma.pendingRegistration.findUnique({
       where: {
         email,
@@ -84,7 +82,6 @@ export async function resendVerificationEmail( data: ResendVerificationData) {
   await redis.set(cooldownKey,"1", "EX", 60);
 
   // 5. Generate OTP
-
   const otp = generateOTP();
   const otpHash = await argon2.hash(otp);
 
@@ -104,23 +101,10 @@ export async function resendVerificationEmail( data: ResendVerificationData) {
 
   // 7. Queue Email
 
-  await emailQueue.add(
-    "send-verification-email",
-    {
-      email,
-      otp,
-    },
-    {
-      attempts: 5,
-      backoff: {
-        type: "exponential",
-        delay: 5000,
-      },
-
-      removeOnComplete: 100,
-      removeOnFail: 1000,
-    }
-  );
+await queueVerificationEmail(
+  email,
+  otp
+);
 
   // 8. Audit Log
 
@@ -139,7 +123,6 @@ export async function resendVerificationEmail( data: ResendVerificationData) {
 
   return {
     success: true,
-    message:
-      "Verification code sent",
+    message: "Verification code sent",
   };
 }

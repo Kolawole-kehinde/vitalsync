@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { Worker } from "bullmq";
-
 import { redis } from "../lib/redis";
 import { sendVerificationEmailJob } from "../jobs/email/send-verification-email";
 

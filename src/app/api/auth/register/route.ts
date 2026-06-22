@@ -1,6 +1,4 @@
 import { AuthError } from "@/src/lib/errors";
-import { checkEmailAbuse } from "@/src/services/auth/register/check-email-abuse";
-import { checkRegisterRateLimit } from "@/src/services/auth/register/check-register-rate-limit";
 import { registerUser } from "@/src/services/auth/register/register.service";
 import { registerSchema } from "@/src/validations/register.schema";
 import { NextRequest, NextResponse } from "next/server";
@@ -25,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     const userAgent = req.headers.get("user-agent") ??"unknown";
 
-    console.log({ipAddress,userAgent,});
+    // console.log({ipAddress,userAgent,});
 
     const result = await registerUser({
         email: validated.data.email,

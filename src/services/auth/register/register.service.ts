@@ -1,6 +1,3 @@
-
-
-import { checkEmailAbuse } from "./check-email-abuse";
 import { checkRegisterRateLimit } from "./check-register-rate-limit";
 import { createPendingRegistration } from "./create-pending-registration";
 import { createVerificationOtp } from "./create-verification-otp";
@@ -9,14 +6,14 @@ import { validateRegistration } from "./register-user-checks";
 import { RegisterData } from "./types";
 
 export async function registerUser(data: RegisterData) {
+
+   const email = data.email.trim().toLowerCase();
   
- await checkRegisterRateLimit(data.ipAddress);
+ await checkRegisterRateLimit({
+  email,
+  ipAddress: data.ipAddress,
+});
  
-
- const email = data.email.trim().toLowerCase();
-
-  await  checkEmailAbuse(data.email);
-
   await validateRegistration( email);
 
   const pending = await createPendingRegistration({
