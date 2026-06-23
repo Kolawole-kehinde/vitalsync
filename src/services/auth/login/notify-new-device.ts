@@ -12,6 +12,19 @@ export async function notifyNewDevice(data: NotifyNewDeviceData) {
       email: data.email,
       deviceName: data.deviceName,
       ipAddress: data.ipAddress,
+    },
+    {
+      attempts: 5,
+
+      backoff: {
+        type: "exponential",
+        delay: 5000,
+      },
+
+      removeOnComplete: 100,
+
+      removeOnFail: 1000,
     }
   );
+  
 }

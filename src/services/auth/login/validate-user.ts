@@ -7,7 +7,7 @@ import { unlockUserIfExpired } from "./unlock-user";
 
 type ValidateUserData = {
   email: string;
-  password: string;
+  candidatePassword: string;
   ipAddress?: string;
   userAgent?: string;
 };
@@ -26,10 +26,9 @@ export async function validateUser(data: ValidateUserData) {
   // Timing Attack Protection
 
   if (!existingUser) {
-    await argon2
-      .verify(
+    await argon2.verify(
         DUMMY_HASH,
-        data.password
+        data.candidatePassword
       )
       .catch(() => null);
 

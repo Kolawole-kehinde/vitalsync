@@ -11,13 +11,12 @@ type SuccessfulLoginData = {
   userAgent?: string;
 };
 
-export async function handleSuccessfulLogin(
-  data: SuccessfulLoginData) {
-  await resetLoginAttempts(
-    data.user.email
-  );
+export async function handleSuccessfulLogin(data: SuccessfulLoginData) {
 
-  const user = await prisma.user.update({
+  await resetLoginAttempts(data.user.email);
+  
+  return await prisma.$transaction(async (tx) => {
+    const user = await tx.user.update({
       where: {
         id: data.user.id,
       },
@@ -28,32 +27,33 @@ export async function handleSuccessfulLogin(
       },
     });
 
-  await prisma.loginAttempt.create({
-    data: {
-      userId: user.id,
-      email: user.email,
-      success: true,ipAddress:
-        data.ipAddress, userAgent:
-        data.userAgent,
-    },
-  });
+    await tx.loginAttempt.create({
+      data: {
+        userId: user.id,
+        email: user.email,
+        success: true,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
+      },
+    });
 
-  await prisma.auditLog.create({
-    data: {
-      userId: user.id,
-      action: "LOGIN_SUCCESS",
-      ipAddress: data.ipAddress,
-      userAgent: data.userAgent,
-    },
-  });
+    await tx.auditLog.create({
+      data: {
+        userId: user.id,
+        action: "LOGIN_SUCCESS",
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
+      },
+    });
 
-  return {
-    success: true,
-    user: {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-    },
-  };
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      },
+    };
+  });
 }

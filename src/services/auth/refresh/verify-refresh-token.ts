@@ -29,15 +29,43 @@ export async function verifyRefreshToken(refreshToken: string) {
     throw new AuthError("Session revoked", 401);
   }
 
-  if (session.expiresAt < new Date()) {
-    throw new AuthError("Session expired", 401);
-  }
+ if (session.expiresAt < new Date()) {
+  await prisma.session.update({
+    where: {
+      id: session.id,
+    },
+    data: {
+      isActive: false,
+      revokedAt: new Date(),
+      revokedReason: "EXPIRED",
+    },
+  });
 
-  const isValid = await argon2.verify(session.refreshTokenHash, secret);
+  throw new AuthError("Session expired", 401);
+}
 
-  if (!isValid) {
-    throw new AuthError("Invalid refresh token", 401);
-  }
+const isValid = await argon2.verify(
+  session.refreshTokenHash,
+  secret
+);
+
+if (!isValid) {
+  await prisma.session.update({
+    where: {
+      id: session.id,
+    },
+    data: {
+      isActive: false,
+      revokedAt: new Date(),
+      revokedReason: "REFRESH_TOKEN_REUSE",
+    },
+  });
+
+  throw new AuthError(
+    "Session compromised",
+    401
+  );
+}
 
   return session;
 }

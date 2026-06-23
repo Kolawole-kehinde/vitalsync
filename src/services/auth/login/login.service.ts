@@ -11,19 +11,20 @@ import { createNewDeviceEvent } from "./create-new-device-event";
 import { notifyNewDevice } from "./notify-new-device";
 import { createSession } from "../sessions/create-session";
 
+
+
 export async function loginService(data: LoginData) {
   const email = data.email.trim().toLowerCase();
-
   const user = await validateUser({
       email,
-      password: data.password,
+      candidatePassword: data.candidatePassword,
       ipAddress: data.ipAddress,
       userAgent: data.userAgent,
     });
 
   const isValidPassword = await verifyPassword({
       passwordHash: user.passwordHash,
-      password: data.password,
+      password: data.candidatePassword,
     });
 
   if (!isValidPassword) {
@@ -60,22 +61,8 @@ export async function loginService(data: LoginData) {
     deviceName,
   });
 
-  if (isNewDevice) {
-  await createNewDeviceEvent({
-    userId: user.id,
-    ipAddress: data.ipAddress,
-    userAgent: data.userAgent,
-    deviceName,
-  });
 
-    await notifyNewDevice({
-    email: user.email,
-    deviceName,
-    ipAddress: data.ipAddress,
-  });
-}
-
- const session = await createSession({
+   const session = await createSession({
   userId: user.id,
   email: user.email,
   role: user.role,
@@ -88,6 +75,23 @@ export async function loginService(data: LoginData) {
   deviceName,
   
 });
+
+  if (isNewDevice) {
+  await createNewDeviceEvent({
+    userId: user.id,
+    ipAddress: data.ipAddress,
+    userAgent: data.userAgent,
+    deviceName,
+  });
+
+  void notifyNewDevice({
+  email: user.email,
+  deviceName,
+  ipAddress: data.ipAddress,
+}).catch(console.error);
+}
+
+
   return {
     success: true,
     user: {

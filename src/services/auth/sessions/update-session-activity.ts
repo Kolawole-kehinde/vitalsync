@@ -5,14 +5,15 @@ import { SESSION_TTL_SECONDS } from "@/src/constants/auth.constants";
 export async function updateSessionActivity(sessionId: string, userId: string) {
   const now = new Date();
 
-  await prisma.session.update({
+  const session = await prisma.session.findUnique({
     where: {
       id: sessionId,
     },
-    data: {
-      lastActivityAt: now,
-    },
   });
+
+  if (!session || !session.isActive) {
+    return;
+  }
 
   await redis.set(
     `session:${sessionId}`,

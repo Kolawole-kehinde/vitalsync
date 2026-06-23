@@ -33,7 +33,8 @@ export async function revokeSession(data: RevokeSessionData) {
     throw new AuthError("Session already revoked", 400);
   }
 
-  await prisma.session.update({
+await Promise.all([
+  prisma.session.update({
     where: {
       id: sessionId,
     },
@@ -42,9 +43,9 @@ export async function revokeSession(data: RevokeSessionData) {
       revokedAt: new Date(),
       revokedReason: "USER_REVOKED",
     },
-  });
-
-  await redis.del(`session:${sessionId}`);
+  }),
+  redis.del(`session:${sessionId}`),
+]);
 
   return {
     success: true,

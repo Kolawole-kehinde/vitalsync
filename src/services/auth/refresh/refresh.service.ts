@@ -5,6 +5,7 @@ import { rotateRefreshToken } from "./rotate-refresh-token";
 import { generateAccessToken } from "../access-token/generate-access-token";
 
 export async function refreshSession(refreshToken: string) {
+  
   const session = await verifyRefreshToken(
       refreshToken
     );

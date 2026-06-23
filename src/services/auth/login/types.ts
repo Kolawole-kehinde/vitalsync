@@ -2,7 +2,7 @@ import type { UserRole } from "@prisma/client";
 
 export type LoginData = {
   email: string;
-  password: string;
+  candidatePassword: string;
   ipAddress?: string;
   userAgent?: string;
 };
