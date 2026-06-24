@@ -3,6 +3,7 @@ import { prisma } from "@/src/lib/prisma";
 import { redis } from "@/src/lib/redis";
 
 export async function logoutService(refreshToken: string){
+   
    const parts = refreshToken.split(".");
 
    if(parts.length !==2){

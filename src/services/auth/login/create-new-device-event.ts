@@ -7,9 +7,7 @@ type CreateNewDeviceEventData = {
   deviceName?: string;
 };
 
-export async function createNewDeviceEvent(
-  data: CreateNewDeviceEventData
-) {
+export async function createNewDeviceEvent( data: CreateNewDeviceEventData) {
   await prisma.$transaction(async (tx) => {
     await tx.securityEvent.create({
       data: {

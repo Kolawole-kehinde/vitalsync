@@ -42,6 +42,7 @@ model User {
   auditLogs      AuditLog[]
   securityEvents SecurityEvent[]
   loginAttempts LoginAttempt[]
+  passwordResets PasswordReset[]
 }
 
 model Session {
@@ -207,6 +208,25 @@ model AuditLog {
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+}
+
+model PasswordReset {
+  id String @id @default(cuid())
+
+  userId String
+
+  tokenHash String
+
+  expiresAt DateTime
+
+  usedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model SecurityEvent {

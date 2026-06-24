@@ -20,35 +20,24 @@ export async function POST(req: Request) {
         },
         {
           status: 400,
-        }
+        },
       );
     }
 
-    const email = validated.data.email
-      .trim()
-      .toLowerCase();
+    const email = validated.data.email.trim().toLowerCase();
 
     const ipAddress =
-      req.headers
-        .get("x-forwarded-for")
-        ?.split(",")[0]
-        ?.trim() ??
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       req.headers.get("x-real-ip") ??
       "unknown";
 
-    const userAgent =
-      req.headers.get("user-agent") ??
-      "unknown";
+    const userAgent = req.headers.get("user-agent") ?? "unknown";
 
-    await checkLoginRateLimit(
-      email,
-      ipAddress
-    );
+    await checkLoginRateLimit(email, ipAddress);
 
     const result = await loginService({
       email,
-      candidatePassword:
-        validated.data.password,
+      candidatePassword: validated.data.password,
       ipAddress,
       userAgent,
     });
@@ -60,18 +49,13 @@ export async function POST(req: Request) {
     });
 
     setAuthCookies(response, {
-      accessToken:
-        result.session.accessToken,
-      refreshToken:
-        result.session.refreshToken,
+      accessToken: result.session.accessToken,
+      refreshToken: result.session.refreshToken,
     });
 
     return response;
   } catch (error) {
-    console.error(
-      "LOGIN ERROR:",
-      error
-    );
+    console.error("LOGIN ERROR:", error);
 
     if (error instanceof AuthError) {
       return NextResponse.json(
@@ -81,19 +65,18 @@ export async function POST(req: Request) {
         },
         {
           status: error.statusCode,
-        }
+        },
       );
     }
 
     return NextResponse.json(
       {
         success: false,
-        message:
-          "Internal server error",
+        message: "Internal server error",
       },
       {
         status: 500,
-      }
+      },
     );
   }
 }

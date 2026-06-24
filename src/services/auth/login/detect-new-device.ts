@@ -11,8 +11,7 @@ export async function detectNewDevice(data: DetectNewDeviceData) {
     return false;
   }
 
-  const existingSession =
-    await prisma.session.findFirst({
+  const existingSession = await prisma.session.findFirst({
       where: {
         userId: data.userId,
         deviceName: data.deviceName,
