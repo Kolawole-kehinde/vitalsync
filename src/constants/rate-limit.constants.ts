@@ -10,6 +10,10 @@ export const REGISTER_EMAIL_LIMIT = 3;
 
 export const REGISTER_EMAIL_WINDOW_SECONDS = 60 * 60;
 
+export const FORGET_PASSWORD_EMAIL_LIMIT = 3;
+
+export const FORGET_PASSWORD_EMAIL_WINDOW_SECONDS = 60 * 60;
+
 
 // export const LOGIN_LIMIT = 3;
 // export const REGISTER_LIMIT = 2;

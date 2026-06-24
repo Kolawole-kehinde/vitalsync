@@ -13,9 +13,7 @@ type RegisterRateLimitData = {
   ipAddress?: string;
 };
 
-export async function checkRegisterRateLimit(
-  data: RegisterRateLimitData
-) {
+export async function checkRegisterRateLimit(data: RegisterRateLimitData) {
   const ip = data.ipAddress ?? "unknown";
 
   // IP protection
