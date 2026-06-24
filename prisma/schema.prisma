@@ -223,12 +223,12 @@ model PasswordReset {
 
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation( fields: [userId],references: [id],onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
+  @@index([usedAt])
 }
-
 model SecurityEvent {
   id String @id @default(cuid())
 
@@ -282,7 +282,7 @@ enum AuditAction {
   NEW_DEVICE_LOGIN
   PASSWORD_RESET_REQUESTED
   PASSWORD_RESET_COMPLETED
-
+  PASSWORD_CHANGED
   ACCOUNT_LOCKED
 }
 

@@ -1,18 +1,30 @@
-import { sendVerificationEmail } from "@/src/lib/email";
+import { sendEmail } from "@/src/lib/email";
 
-export async function sendVerificationEmailJob(data: {
-  email: string;
-  otp: string;
-}) {
-  const { email, otp } = data;
+type SendVerificationEmailData = {
+email: string;
+otp: string;
+};
 
-  try {
-    const result = await sendVerificationEmail(email, otp);
+export async function sendVerificationEmailJob(
+data: SendVerificationEmailData
+) {
+await sendEmail({
+to: data.email,
+subject:
+"Verify your VitaSync account",
+html: ` <h2>Email Verification</h2>
 
-    console.log("Email sent:", result);
-  } catch (error) {
-    console.error("Email send failed:", error);
+  <p>
+    Your verification code is:
+  </p>
 
-    throw error;
-  }
+  <h1>${data.otp}</h1>
+
+  <p>
+    This code expires in 15 minutes.
+  </p>
+`,
+
+
+});
 }
