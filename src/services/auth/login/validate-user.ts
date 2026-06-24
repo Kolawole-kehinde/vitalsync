@@ -36,12 +36,9 @@ export async function validateUser(data: ValidateUserData) {
       data: {
         email: data.email,
         success: false,
-        failureReason:
-          "INVALID_CREDENTIALS",
-        ipAddress:
-          data.ipAddress,
-        userAgent:
-          data.userAgent,
+        failureReason: "INVALID_CREDENTIALS",
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
       },
     });
 
@@ -54,8 +51,7 @@ export async function validateUser(data: ValidateUserData) {
 
   // Auto Unlock Expired Lock
 
-  const user =
-    await unlockUserIfExpired(
+  const user = await unlockUserIfExpired(
       existingUser
     );
 

@@ -20,27 +20,37 @@ export async function POST(req: Request) {
         },
         {
           status: 400,
-        },
+        }
       );
     }
 
-  const ipAddress = req.headers
-    .get("x-forwarded-for")
-    ?.split(",")[0]
-    ?.trim() ??
-  req.headers.get("x-real-ip") ?? "unknown";
+    const email = validated.data.email
+      .trim()
+      .toLowerCase();
 
-// const userAgent =
-//   req.headers.get("user-agent") ??
-//   "unknown";
+    const ipAddress =
+      req.headers
+        .get("x-forwarded-for")
+        ?.split(",")[0]
+        ?.trim() ??
+      req.headers.get("x-real-ip") ??
+      "unknown";
 
-  await checkLoginRateLimit(ipAddress)
+    const userAgent =
+      req.headers.get("user-agent") ??
+      "unknown";
+
+    await checkLoginRateLimit(
+      email,
+      ipAddress
+    );
 
     const result = await loginService({
-      email: validated.data.email,
-      candidatePassword: validated.data.password,
-      ipAddress:req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??req.headers.get("x-real-ip") ??"unknown",
-      userAgent: req.headers.get("user-agent") ?? "unknown",
+      email,
+      candidatePassword:
+        validated.data.password,
+      ipAddress,
+      userAgent,
     });
 
     const response = NextResponse.json({
@@ -50,13 +60,18 @@ export async function POST(req: Request) {
     });
 
     setAuthCookies(response, {
-      accessToken: result.session.accessToken,
-      refreshToken: result.session.refreshToken,
+      accessToken:
+        result.session.accessToken,
+      refreshToken:
+        result.session.refreshToken,
     });
 
     return response;
   } catch (error) {
-    console.error("LOGIN ERROR:", error);
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
 
     if (error instanceof AuthError) {
       return NextResponse.json(
@@ -66,18 +81,19 @@ export async function POST(req: Request) {
         },
         {
           status: error.statusCode,
-        },
+        }
       );
     }
 
     return NextResponse.json(
       {
         success: false,
-        message: "Internal server error",
+        message:
+          "Internal server error",
       },
       {
         status: 500,
-      },
+      }
     );
   }
 }

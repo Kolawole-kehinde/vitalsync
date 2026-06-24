@@ -15,6 +15,7 @@ import { createSession } from "../sessions/create-session";
 
 export async function loginService(data: LoginData) {
   const email = data.email.trim().toLowerCase();
+  
   const user = await validateUser({
       email,
       candidatePassword: data.candidatePassword,
