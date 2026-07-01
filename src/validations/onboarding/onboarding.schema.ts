@@ -44,6 +44,10 @@ export const onboardingSchema = z.object({
     }
   ),
 
+  timezone: z.string().min(1).max(100),
+
+locale: z.string().min(2).max(10),
+
   height: z
     .number({
       error: "Height must be a number",

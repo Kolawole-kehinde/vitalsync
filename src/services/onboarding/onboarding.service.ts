@@ -43,6 +43,8 @@ export async function onboardingService(data: OnboardingServiceData) {
         activityLevel: data.activityLevel,
         primaryGoal: data.primaryGoal,
         preferredUnit: data.preferredUnit,
+        timezone: data.timezone,
+        locale: data.locale,
       },
     });
 

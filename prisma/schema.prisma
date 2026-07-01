@@ -304,6 +304,10 @@ model WellnessPreferences {
 
   stepGoal Int?
 
+  timezone String @default("Africa/Lagos")
+
+  locale String @default("en-NG")
+
   notificationsEnabled Boolean @default(true)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
