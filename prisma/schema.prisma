@@ -29,6 +29,10 @@ model User {
 
   lockedUntil DateTime?
 
+  profile Profile?
+
+  wellnessPreferences WellnessPreferences?
+
   lastLoginAt DateTime?
 
   onboardingCompleted Boolean @default(false)
@@ -41,7 +45,7 @@ model User {
   resetTokens    PasswordResetToken[]
   auditLogs      AuditLog[]
   securityEvents SecurityEvent[]
-  loginAttempts LoginAttempt[]
+  loginAttempts  LoginAttempt[]
   passwordResets PasswordReset[]
 }
 
@@ -80,7 +84,7 @@ model Session {
 
   lastActivityAt DateTime?
 
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, isActive])
@@ -223,12 +227,13 @@ model PasswordReset {
 
   createdAt DateTime @default(now())
 
-  user User @relation( fields: [userId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
   @@index([usedAt])
 }
+
 model SecurityEvent {
   id String @id @default(cuid())
 
@@ -263,7 +268,7 @@ model Profile {
   userId String @unique
 
   firstName String
-  lastName String
+  lastName  String
 
   dateOfBirth DateTime
 
@@ -301,10 +306,8 @@ model WellnessPreferences {
 
   notificationsEnabled Boolean @default(true)
 
-  user User @relation(fields: [userId], references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
-
 
 enum UserStatus {
   ACTIVE
@@ -331,6 +334,7 @@ enum AuditAction {
   PASSWORD_RESET_COMPLETED
   PASSWORD_CHANGED
   ACCOUNT_LOCKED
+  ONBOARDING_COMPLETED
 }
 
 enum LoginFailureReason {
@@ -363,6 +367,7 @@ enum SecurityEventType {
   OTP_BRUTE_FORCE
   OTP_RESEND_ABUSE
   PASSWORD_RESET_REQUESTED
+   ONBOARDING_COMPLETED
 }
 
 enum UserRole {

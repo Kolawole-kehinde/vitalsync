@@ -94,6 +94,4 @@ export const onboardingSchema = z.object({
   ),
 });
 
-export type OnboardingInput = z.infer<
-  typeof onboardingSchema
->;
+export type OnboardingInput = z.infer<typeof onboardingSchema>;

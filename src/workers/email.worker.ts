@@ -7,6 +7,7 @@ import { sendForgotPasswordEmailJob }
 from "../jobs/email/send-forgot-password-email";
 import { sendPasswordChangedEmailJob } from "../jobs/email/send-password-changed-email";
 import { sendNewDeviceLoginEmailJob } from "../jobs/email/send-new-device-login-email";
+import { sendOnboardingEmailJob } from "../jobs/email/send-onboarding-email";
 
 
 const worker = new Worker("email-queue",async (job) => {
@@ -33,6 +34,10 @@ const worker = new Worker("email-queue",async (job) => {
   await sendNewDeviceLoginEmailJob(
     job.data
   );
+  break;
+
+  case "send-onboarding-email":
+  await sendOnboardingEmailJob(job.data);
   break;
 
   default:

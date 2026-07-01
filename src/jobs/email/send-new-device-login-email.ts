@@ -1,36 +1,30 @@
-import { sendEmail } from "@/src/lib/email";
+import React from "react";
 
-type NewDeviceLoginData = {
+import NewDeviceLoginEmail from "@/src/emails/NewDeviceLoginEmail";
+import { sendEmail } from "@/src/lib/email/send-email";
+
+
+type NewDeviceLoginEmailJobData = {
   email: string;
   deviceName?: string;
   ipAddress?: string;
 };
 
-export async function sendNewDeviceLoginEmailJob(data: NewDeviceLoginData) {
+export async function sendNewDeviceLoginEmailJob({
+  email,
+  deviceName,
+  ipAddress,
+}: NewDeviceLoginEmailJobData) {
   await sendEmail({
-    to: data.email,
-    subject: "New Device Login Detected",
-    html: `
-      <h2>New Device Login</h2>
+    to: email,
+    subject: "New Device Login",
 
-      <p>
-        A login was detected from a new device.
-      </p>
-
-      <p>
-        Device:
-        ${data.deviceName ?? "Unknown"}
-      </p>
-
-      <p>
-        IP Address:
-        ${data.ipAddress ?? "Unknown"}
-      </p>
-
-      <p>
-        If this wasn't you,
-        change your password immediately.
-      </p>
-    `,
+    react: React.createElement(
+      NewDeviceLoginEmail,
+      {
+        deviceName,
+        ipAddress,
+      }
+    ),
   });
 }

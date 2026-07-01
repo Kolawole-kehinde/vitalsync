@@ -1,26 +1,23 @@
-import { sendEmail } from "@/src/lib/email";
+import React from "react";
+
+import PasswordChangedEmail from "@/src/emails/PasswordChangedEmail";
+import { sendEmail } from "@/src/lib/email/send-email";
+
+
 
 type PasswordChangedEmailData = {
-email: string;
+  email: string;
 };
 
-export async function sendPasswordChangedEmailJob(
-data: PasswordChangedEmailData
-) {
-await sendEmail({
-to: data.email,
-subject:"Password Changed",
-html: ` <h2>Password Changed</h2>
+export async function sendPasswordChangedEmailJob({
+  email,
+}: PasswordChangedEmailData) {
+  await sendEmail({
+    to: email,
+    subject: "Password Changed",
 
-  <p>
-    Your password was changed successfully.
-  </p>
-
-  <p>
-    If this wasn't you,
-    contact support immediately.
-  </p>
-`,
-
-});
+    react: React.createElement(
+      PasswordChangedEmail
+    ),
+  });
 }
