@@ -257,6 +257,53 @@ model SecurityEvent {
   @@index([createdAt])
 }
 
+model Profile {
+  id String @id @default(cuid())
+
+  userId String @unique
+
+  firstName String
+  lastName String
+
+  dateOfBirth DateTime
+
+  gender Gender
+
+  height Float
+
+  weight Float
+
+  avatar String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model WellnessPreferences {
+  userId String @id
+
+  activityLevel ActivityLevel
+
+  primaryGoal FitnessGoal
+
+  preferredUnit PreferredUnit
+
+  calorieGoal Int?
+
+  hydrationGoal Int?
+
+  sleepGoal Float?
+
+  stepGoal Int?
+
+  notificationsEnabled Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id],onDelete: Cascade)
+}
+
 
 
 enum UserStatus {
@@ -321,4 +368,33 @@ enum SecurityEventType {
 enum UserRole {
   USER
   ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHTLY_ACTIVE
+  MODERATELY_ACTIVE
+  VERY_ACTIVE
+  ATHLETE
+}
+
+enum FitnessGoal {
+  LOSE_WEIGHT
+  MAINTAIN_WEIGHT
+  GAIN_WEIGHT
+  BUILD_MUSCLE
+  IMPROVE_FITNESS
+  IMPROVE_SLEEP
+  GENERAL_WELLNESS
+}
+
+enum PreferredUnit {
+  METRIC
+  IMPERIAL
 }
