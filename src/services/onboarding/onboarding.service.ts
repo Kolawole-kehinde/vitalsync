@@ -1,5 +1,5 @@
+import { queueOnboardingEmail } from "./queue-onboarding-email";
 import { OnboardingInput } from "@/src/validations/onboarding/onboarding.schema";
-
 import { prisma } from "@/src/lib/prisma";
 import { AuthError } from "@/src/lib/errors";
 
@@ -10,25 +10,21 @@ type OnboardingServiceData = {
 } & OnboardingInput;
 
 export async function onboardingService(data: OnboardingServiceData) {
-  // Fetch user
   const user = await prisma.user.findUnique({
     where: {
       id: data.userId,
     },
   });
 
-  // User must exist
   if (!user) {
     throw new AuthError("User not found", 404);
   }
 
-  // Prevent onboarding twice
   if (user.onboardingCompleted) {
     throw new AuthError("Onboarding already completed", 400);
   }
 
-  // Transaction
-  return await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const profile = await tx.profile.create({
       data: {
         userId: data.userId,
@@ -91,8 +87,11 @@ export async function onboardingService(data: OnboardingServiceData) {
     return {
       success: true,
       message: "Onboarding completed successfully",
-      profile,
-      preferences,
     };
   });
+
+  // Queue welcome email AFTER successful commit
+  void queueOnboardingEmail(user.email, data.firstName).catch(console.error);
+
+  return result;
 }
